@@ -8,10 +8,11 @@ using Windows.Storage;
 
 namespace WinUI_SFTP_Browser;
 
-public class SftpService
+public class SftpService : IDisposable
 {
     private SftpClient? _client;
     private bool _isConnected;
+    private bool _disposed;
 
     public async Task ConnectAsync(SftpConnectionInfo connectionInfo)
     {
@@ -201,7 +202,7 @@ public class SftpService
                 {
                     var subFolder = await localFolder.CreateFolderAsync(file.Name, 
                         CreationCollisionOption.OpenIfExists);
-                    await DownloadDirectoryAsync(file.FullName, localFolder, file.Name);
+                    await DownloadDirectoryAsync(file.FullName, subFolder, file.Name);
                 }
                 else
                 {
@@ -221,6 +222,24 @@ public class SftpService
             _client.Disconnect();
             _client.Dispose();
             _isConnected = false;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                Disconnect();
+            }
+            _disposed = true;
         }
     }
 }

@@ -148,7 +148,7 @@ public partial class MainWindowViewModel : ObservableObject
             
             CurrentPath = path;
             StatusText = $"{files.Count} item(s)";
-            ShowEmptyState = !IsConnected;
+            ShowEmptyState = false;
         }
         catch (Exception ex)
         {
@@ -254,7 +254,8 @@ public partial class MainWindowViewModel : ObservableObject
             IsLoading = true;
             StatusText = $"Renaming {item.Name}...";
             
-            await _sftpService.RenameItemAsync(item.FullPath, CurrentPath + "/" + newName);
+            var newPath = CurrentPath.TrimEnd('/') + "/" + newName;
+            await _sftpService.RenameItemAsync(item.FullPath, newPath);
             
             await RefreshAsync();
             StatusText = $"Renamed {item.Name} to {newName}";
