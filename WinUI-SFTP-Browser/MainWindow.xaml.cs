@@ -166,9 +166,9 @@ public sealed partial class MainWindow : Window
 
     private void FileListView_RightTapped(object sender, RightTappedRoutedEventArgs e)
     {
-        if (e.OriginalSource is FrameworkElement element)
+        if (e.OriginalSource is FrameworkElement element && this.Content is FrameworkElement root)
         {
-            var flyout = Resources["FileContextMenu"] as MenuFlyout;
+            var flyout = root.Resources["FileContextMenu"] as MenuFlyout;
             flyout?.ShowAt(element, e.GetPosition(element));
         }
     }
