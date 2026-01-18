@@ -44,7 +44,7 @@ public sealed partial class MainWindow : Window
 
     private async void Connect_Click(object sender, RoutedEventArgs e)
     {
-        await NewConnection_Click(sender, e);
+        NewConnection_Click(sender, e);
     }
 
     private async void Refresh_Click(object sender, RoutedEventArgs e)
@@ -175,12 +175,12 @@ public sealed partial class MainWindow : Window
 
     private async void DownloadContextMenu_Click(object sender, RoutedEventArgs e)
     {
-        await Download_Click(sender, e);
+        Download_Click(sender, e);
     }
 
     private async void DeleteContextMenu_Click(object sender, RoutedEventArgs e)
     {
-        await Delete_Click(sender, e);
+        Delete_Click(sender, e);
     }
 
     private async void RenameContextMenu_Click(object sender, RoutedEventArgs e)
