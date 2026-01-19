@@ -1,0 +1,54 @@
+<Page
+    x:Class="SFTP_Browser.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SFTP_Browser.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer>
+        <StackPanel Spacing="12" Padding="16" HorizontalAlignment="Stretch">
+
+            <TextBlock Text="Notifications" Style="{ThemeResource SubtitleTextBlockStyle}" />
+
+            <ToggleSwitch
+                Header="Enable notifications"
+                IsOn="{x:Bind ViewModel.NotificationsEnabled, Mode=TwoWay}" />
+
+            <TextBlock Text="Background Sync" Style="{ThemeResource SubtitleTextBlockStyle}" />
+
+            <ToggleSwitch
+                Header="Enable background sync"
+                IsOn="{x:Bind ViewModel.BackgroundSyncEnabled, Mode=TwoWay}" />
+
+            <TextBox
+                Header="Remote folder"
+                Text="{x:Bind ViewModel.BackgroundSyncRemoteFolder, Mode=TwoWay}" />
+
+            <TextBox
+                Header="Local folder"
+                Text="{x:Bind ViewModel.BackgroundSyncLocalFolder, Mode=TwoWay}" />
+
+            <NumberBox
+                Header="Interval (minutes)"
+                Minimum="1"
+                SpinButtonPlacementMode="Compact"
+                Value="{x:Bind ViewModel.BackgroundSyncIntervalMinutes, Mode=TwoWay}" />
+
+            <ComboBox
+                Header="Conflict handling"
+                SelectedIndex="{x:Bind ViewModel.BackgroundSyncConflictSelectedIndex, Mode=TwoWay}" Width="450">
+                <ComboBoxItem Content="Skip" />
+                <ComboBoxItem Content="Overwrite" />
+            </ComboBox>
+
+            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                <Button Content="Save" Click="Save_Click" Width="200" />
+                <Button Content="Reload" Click="Reload_Click" Width="200" />
+            </StackPanel>
+
+            <TextBlock Text="Credentials for scheduled sync are stored securely in Windows Credential Manager after a successful password-based connection." TextWrapping="Wrap" Opacity="0.7" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

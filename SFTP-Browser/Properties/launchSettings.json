@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "SFTP-Browser (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "SFTP-Browser (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
