@@ -43,19 +43,28 @@
                 <ComboBoxItem Content="Overwrite" />
             </ComboBox>
 
+            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" Margin="0,8,0,0">
+                <Button Content="Save" Click="Save_Click" Width="200" />
+                <Button Content="Reload" Click="Reload_Click" Width="200" />
+            </StackPanel>
+
             <TextBlock Text="About" Style="{ThemeResource SubtitleTextBlockStyle}" />
 
             <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                 <TextBlock Text="Version:" VerticalAlignment="Center" />
                 <TextBlock Text="{x:Bind ViewModel.AppVersion, Mode=OneWay}" VerticalAlignment="Center" FontWeight="Bold" />
-                <Button x:Name="CheckUpdatesButton" Content="Check for Updates" Command="{x:Bind ViewModel.CheckForUpdatesCommand}" />
             </StackPanel>
 
-            <TextBlock Text="{x:Bind ViewModel.UpdateCheckMessage, Mode=OneWay}" TextWrapping="Wrap" Opacity="0.8" />
+            <StackPanel Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button x:Name="CheckUpdatesButton" Content="Check for Updates" Command="{x:Bind ViewModel.CheckForUpdatesCommand}" />
+                    <Button x:Name="DownloadUpdateButton" Content="Download Update" Command="{x:Bind ViewModel.DownloadAndInstallUpdateCommand}" Visibility="{x:Bind ViewModel.UpdateAvailable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <Button x:Name="InstallUpdateButton" Content="Install Update" Command="{x:Bind ViewModel.InstallUpdateCommand}" Visibility="{x:Bind ViewModel.UpdateDownloaded, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                </StackPanel>
 
-            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" Margin="0,8,0,0">
-                <Button Content="Save" Click="Save_Click" Width="200" />
-                <Button Content="Reload" Click="Reload_Click" Width="200" />
+                <ProgressBar x:Name="UpdateProgressBar" Value="{x:Bind ViewModel.UpdateDownloadProgress, Mode=OneWay}" Maximum="100" Visibility="{x:Bind ViewModel.IsDownloadingUpdate, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                <TextBlock Text="{x:Bind ViewModel.UpdateCheckMessage, Mode=OneWay}" TextWrapping="Wrap" Opacity="0.8" />
             </StackPanel>
 
             <TextBlock Text="Credentials for scheduled sync are stored securely in Windows Credential Manager after a successful password-based connection." TextWrapping="Wrap" Opacity="0.7" />

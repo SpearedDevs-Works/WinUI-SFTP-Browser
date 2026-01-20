@@ -16,6 +16,8 @@ public sealed partial class SettingsViewModel : ObservableObject
 {
     private readonly SettingsService _settingsService = App.SettingsService;
     private readonly UpdateCheckService _updateCheckService = new();
+    private Release? _latestRelease;
+    private string? _downloadedInstallerPath;
 
     [ObservableProperty]
     private bool _notificationsEnabled = true;
@@ -43,6 +45,28 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty]
     private string? _updateCheckMessage;
+
+    [ObservableProperty]
+    private bool _isDownloadingUpdate;
+
+    [ObservableProperty]
+    private int _updateDownloadProgress;
+
+    [ObservableProperty]
+    private bool _updateAvailable;
+
+    [ObservableProperty]
+    private bool _updateDownloaded;
+
+    public SettingsViewModel()
+    {
+        _updateCheckService.DownloadProgressChanged += UpdateCheckService_DownloadProgressChanged;
+    }
+
+    private void UpdateCheckService_DownloadProgressChanged(object? sender, UpdateProgressEventArgs e)
+    {
+        UpdateDownloadProgress = e.ProgressPercentage;
+    }
 
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
@@ -85,15 +109,19 @@ public sealed partial class SettingsViewModel : ObservableObject
     {
         IsCheckingForUpdates = true;
         UpdateCheckMessage = null;
+        UpdateAvailable = false;
+        UpdateDownloaded = false;
 
         try
         {
-            var currentVersion = AppVersion.Split('-')[0]; // Handle pre-release versions
+            var currentVersion = AppVersion.Split('-')[0];
             var latestRelease = await _updateCheckService.CheckForUpdatesAsync(currentVersion, cancellationToken);
 
             if (latestRelease != null)
             {
-                UpdateCheckMessage = $"New version available: {latestRelease.TagName}. Visit {latestRelease.HtmlUrl} to download.";
+                _latestRelease = latestRelease;
+                UpdateAvailable = true;
+                UpdateCheckMessage = $"New version available: {latestRelease.TagName}";
             }
             else
             {
@@ -108,5 +136,79 @@ public sealed partial class SettingsViewModel : ObservableObject
         {
             IsCheckingForUpdates = false;
         }
+    }
+
+    [RelayCommand]
+    public async Task DownloadAndInstallUpdateAsync(CancellationToken cancellationToken = default)
+    {
+        if (_latestRelease == null)
+        {
+            UpdateCheckMessage = "No update available to download.";
+            return;
+        }
+
+        IsDownloadingUpdate = true;
+        UpdateDownloadProgress = 0;
+        UpdateCheckMessage = "Downloading update...";
+
+        try
+        {
+            // Download the update
+            var installerPath = await _updateCheckService.DownloadReleaseAsync(_latestRelease, cancellationToken);
+
+            if (installerPath == null)
+            {
+                UpdateCheckMessage = "Failed to download update. Please try again later.";
+                return;
+            }
+
+            _downloadedInstallerPath = installerPath;
+            UpdateDownloaded = true;
+            UpdateCheckMessage = $"Update downloaded. Click 'Install Update' to install version {_latestRelease.TagName}.";
+        }
+        catch (Exception ex)
+        {
+            UpdateCheckMessage = $"Error downloading update: {ex.Message}";
+        }
+        finally
+        {
+            IsDownloadingUpdate = false;
+        }
+    }
+
+    [RelayCommand]
+    public async Task InstallUpdateAsync(CancellationToken cancellationToken = default)
+    {
+        if (_downloadedInstallerPath == null || !System.IO.File.Exists(_downloadedInstallerPath))
+        {
+            UpdateCheckMessage = "Installer file not found. Please download again.";
+            return;
+        }
+
+        UpdateCheckMessage = "Installing update. The application will restart...";
+
+        try
+        {
+            var success = await _updateCheckService.InstallUpdateAsync(_downloadedInstallerPath, cancellationToken);
+
+            if (success)
+            {
+                UpdateCheckMessage = "Update installed successfully. Please restart the application.";
+                UpdateDownloaded = false;
+            }
+            else
+            {
+                UpdateCheckMessage = "Update installation completed. Please restart the application manually.";
+            }
+        }
+        catch (Exception ex)
+        {
+            UpdateCheckMessage = $"Error installing update: {ex.Message}";
+        }
+    }
+
+    public void CleanupOldUpdates()
+    {
+        _updateCheckService.CleanupDownloads();
     }
 }
