@@ -9,7 +9,7 @@
 
   <Identity
     Name="ab0a5cf0-191c-4dab-a3ab-145d7a3964c4"
-    Publisher="CN=SpearedDevs Works"
+    Publisher="CN=SpearedDevs-Works"
     Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="ab0a5cf0-191c-4dab-a3ab-145d7a3964c4" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
